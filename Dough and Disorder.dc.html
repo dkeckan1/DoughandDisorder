@@ -10,6 +10,13 @@
 <meta name="ext-resource-dependency" content="assets/shop-3.png" data-resource-id="heroShop3" />
 <meta name="ext-resource-dependency" content="assets/shop-4.png" data-resource-id="heroShop4" />
 <meta name="ext-resource-dependency" content="assets/shop-1.png" data-resource-id="heroShop1" />
+<meta name="ext-resource-dependency" content="assets/style-new-york.jpg" data-resource-id="styleNewYork" />
+<meta name="ext-resource-dependency" content="assets/style-cleveland-crimp.jpg" data-resource-id="styleClevelandCrimp" />
+<meta name="ext-resource-dependency" content="assets/style-neapolitan.jpg" data-resource-id="styleNeapolitan" />
+<meta name="ext-resource-dependency" content="assets/style-detroit.jpg" data-resource-id="styleDetroit" />
+<meta name="ext-resource-dependency" content="assets/style-tavern.jpg" data-resource-id="styleTavern" />
+<meta name="ext-resource-dependency" content="assets/style-sicilian.jpg" data-resource-id="styleSicilian" />
+<meta name="ext-resource-dependency" content="assets/style-deep-dish.jpg" data-resource-id="styleDeepDish" />
 <script src="./support.js"></script>
 </head>
 <body>
@@ -40,7 +47,12 @@
     .dd-heroInner{flex-direction:column !important; min-height:0 !important; text-align:center !important; gap:22px !important; padding:34px 20px 40px !important; justify-content:center !important;}
     .dd-heroText{max-width:100% !important;}
     .dd-heroText p{margin-left:auto !important; margin-right:auto !important;}
-    .dd-heroScrim{background:linear-gradient(180deg, rgba(12,9,6,.46) 0%, rgba(12,9,6,.62) 100%) !important;}
+    /* Hero redesign: solid text block on top, clear photo band below */
+    .dd-hero{display:flex !important; flex-direction:column !important;}
+    .dd-heroScrim, .dd-heroScrim2{display:none !important;}
+    .dd-heroImgs{position:static !important; order:2; height:232px !important; flex:none !important;}
+    .dd-heroImgs img{filter:grayscale(1) contrast(1.04) brightness(1.06) !important;}
+    .dd-heroImgs img:nth-child(n+3){display:none !important;}
     .dd-heroLogo{display:inline-block !important; transform:rotate(-2deg) !important; order:-1;}
     .dd-heroLogoImg{width:128px !important; height:128px !important;}
     .dd-heroTitle{font-size:50px !important;}
@@ -80,6 +92,34 @@
     .dd-styleBody{padding:14px 15px !important; gap:8px !important;}
     .dd-styleName{font-size:22px !important;}
     .dd-styleDesc{font-size:16px !important; line-height:1.55 !important;}
+
+    /* Sub-pages start below the taller wrapped mobile header */
+    .dd-overlay{padding-top:122px !important;}
+
+    /* Map section heading */
+    .dd-secTitle{font-size:32px !important;}
+    .dd-secSub{font-size:17px !important;}
+
+    /* About */
+    .dd-aboutPara{font-size:17px !important; line-height:1.65 !important;}
+
+    /* Prevent iOS zoom-on-focus */
+    .dd-search input{font-size:16px !important;}
+
+    /* Video lightbox */
+    .dd-videoWrap{padding:10px !important; padding-top:20px !important; align-items:flex-start !important;}
+    .dd-videoHead{padding:11px 13px !important; gap:10px !important;}
+    .dd-videoHead > img{display:none !important;}
+    .dd-videoTitle{font-size:19px !important;}
+    .dd-videoMeta{font-size:12px !important;}
+    .dd-videoFoot{padding:13px 14px !important;}
+    .dd-videoVerdict{font-size:15px !important;}
+
+    /* Footer */
+    .dd-footerInner{flex-direction:column !important; text-align:center !important; gap:14px !important; padding:40px 22px !important;}
+    .dd-footerSub{margin-left:0 !important;}
+
+    .dd-footerEditRow{justify-content:center !important;}
   }
   @media (max-width:380px){
     .dd-heroTitle{font-size:40px !important;}
@@ -112,7 +152,7 @@
 
   <!-- ===== HERO ===== -->
   <section class="dd-hero" data-screen-label="Home" style="position:relative; min-height:632px; overflow:hidden; background:#14110d;">
-    <div style="position:absolute; inset:0; display:flex; gap:3px; background:#14110d;">
+    <div class="dd-heroImgs" style="position:absolute; inset:0; display:flex; gap:3px; background:#14110d;">
       {{ heroImg0El }}
       {{ heroImg1El }}
       {{ heroImg2El }}
@@ -120,7 +160,7 @@
       {{ heroImg4El }}
     </div>
     <div class="dd-heroScrim" style="position:absolute; inset:0; background:linear-gradient(90deg, rgba(12,9,6,.86) 0%, rgba(12,9,6,.58) 40%, rgba(12,9,6,.14) 72%, rgba(12,9,6,0) 100%);"></div>
-    <div style="position:absolute; inset:0; background:linear-gradient(0deg, rgba(12,9,6,.55) 0%, transparent 36%);"></div>
+    <div class="dd-heroScrim2" style="position:absolute; inset:0; background:linear-gradient(0deg, rgba(12,9,6,.55) 0%, transparent 36%);"></div>
     <div class="dd-heroInner" style="position:relative; z-index:2; max-width:1300px; margin:0 auto; min-height:632px; display:flex; align-items:center; justify-content:space-between; gap:40px; padding:64px 22px;">
       <div class="dd-heroText" style="max-width:620px;">
         <div class="dd-heroKicker" style="font:600 12px/1 'Oswald',sans-serif; letter-spacing:.34em; text-transform:uppercase; color:#e7b94e;">{{ heroKicker }}</div>
@@ -140,8 +180,8 @@
     <div class="dd-mapHead" style="display:flex; align-items:flex-end; justify-content:space-between; gap:18px; flex-wrap:wrap; margin-bottom:34px;">
       <div>
         <div style="width:44px; height:4px; background:#d12b25; margin-bottom:18px;"></div>
-        <h2 style="font:400 44px/0.95 'Anton',sans-serif; letter-spacing:.02em; text-transform:uppercase; color:#14110d;">{{ mapHeading }}</h2>
-        <p style="margin-top:8px; font:italic 400 23px/1.4 'Libre Baskerville',serif; color:#5a5044;">{{ mapSubtitle }}</p>
+        <h2 class="dd-secTitle" style="font:400 44px/0.95 'Anton',sans-serif; letter-spacing:.02em; text-transform:uppercase; color:#14110d;">{{ mapHeading }}</h2>
+        <p class="dd-secSub" style="margin-top:8px; font:italic 400 23px/1.4 'Libre Baskerville',serif; color:#5a5044;">{{ mapSubtitle }}</p>
       </div>
       <div class="dd-search" style="display:flex; align-items:center; gap:9px; background:#fffdf5; border:2px solid #14110d; border-radius:3px; padding:11px 15px; min-width:244px;">
         <span style="color:#d12b25; font-size:15px;">⌕</span>
@@ -200,19 +240,22 @@
 
   <!-- ===== FOOTER ===== -->
   <footer style="background:#14110d; color:#e8ddca;">
-    <div style="max-width:1300px; margin:0 auto; padding:52px 22px; display:flex; align-items:center; gap:18px; flex-wrap:wrap;">
+    <div class="dd-footerInner" style="max-width:1300px; margin:0 auto; padding:52px 22px; display:flex; align-items:center; gap:18px; flex-wrap:wrap;">
       {{ logoFooterEl }}
       <div>
         <div style="font:400 26px/1 'Anton'; text-transform:uppercase; color:#f6f4ee;">Dough <span style="color:#d12b25;">&amp;</span> Disorder</div>
         <div style="font:italic 400 20px/1.2 'Libre Baskerville',serif; color:#a8997f; margin-top:6px;">{{ footerTagline }}</div>
       </div>
-      <a href="{{ youtubeUrl }}" target="_blank" rel="noopener" style="margin-left:auto; text-decoration:none; display:inline-flex; align-items:center; gap:9px; background:#d12b25; color:#f6f4ee; font:600 13px/1 'Oswald'; letter-spacing:.08em; text-transform:uppercase; padding:13px 20px; border-radius:3px;">▶ Subscribe on YouTube</a>
+      <a href="{{ youtubeUrl }}" target="_blank" rel="noopener" class="dd-footerSub" style="margin-left:auto; text-decoration:none; display:inline-flex; align-items:center; gap:9px; background:#d12b25; color:#f6f4ee; font:600 13px/1 'Oswald'; letter-spacing:.08em; text-transform:uppercase; padding:13px 20px; border-radius:3px;">▶ Subscribe on YouTube</a>
+    </div>
+    <div class="dd-footerEditRow" style="max-width:1300px; margin:0 auto; padding:0 22px 22px; display:flex; justify-content:flex-end;">
+      <span onClick="{{ openAdmin }}" style="font:500 12px/1 'Oswald',sans-serif; letter-spacing:.08em; text-transform:uppercase; color:#6b6152; cursor:pointer; padding:6px 0;" style-hover="color:#a8997f; text-decoration:underline;">✎ Edit site</span>
     </div>
   </footer>
 
   <!-- ===== PIZZA RATINGS OVERLAY ===== -->
   <sc-if value="{{ isRatings }}" hint-placeholder-val="{{ false }}">
-    <div data-screen-label="Pizza Ratings" style="position:fixed; inset:0; z-index:60; padding-top:80px; overflow-y:auto; background:#f6f4ee;">
+    <div data-screen-label="Pizza Ratings" class="dd-overlay" style="position:fixed; inset:0; z-index:60; padding-top:80px; overflow-y:auto; background:#f6f4ee;">
       <div>
         <div style="max-width:800px; margin:0 auto; padding:64px 22px 0; text-align:center;">
           <h2 class="dd-overlayTitle" style="font:400 50px/0.92 'Anton'; text-transform:uppercase; letter-spacing:.02em; color:#14110d;">{{ ratingsHeading }}</h2>
@@ -243,7 +286,7 @@
 
   <!-- ===== PIZZA STYLES OVERLAY ===== -->
   <sc-if value="{{ isStyles }}" hint-placeholder-val="{{ false }}">
-    <div data-screen-label="Pizza Styles" style="position:fixed; inset:0; z-index:60; padding-top:80px; overflow-y:auto; background:#f6f4ee;">
+    <div data-screen-label="Pizza Styles" class="dd-overlay" style="position:fixed; inset:0; z-index:60; padding-top:80px; overflow-y:auto; background:#f6f4ee;">
       <div>
         <div style="max-width:920px; margin:0 auto; padding:64px 22px 0; text-align:center;">
           <h2 class="dd-overlayTitle" style="font:400 50px/0.92 'Anton'; text-transform:uppercase; letter-spacing:.02em; color:#14110d;">{{ stylesHeading }}</h2>
@@ -275,16 +318,16 @@
 
   <!-- ===== ABOUT OVERLAY ===== -->
   <sc-if value="{{ isAbout }}" hint-placeholder-val="{{ false }}">
-    <div data-screen-label="About" style="position:fixed; inset:0; z-index:60; padding-top:80px; overflow-y:auto; background:#f6f4ee;">
+    <div data-screen-label="About" class="dd-overlay" style="position:fixed; inset:0; z-index:60; padding-top:80px; overflow-y:auto; background:#f6f4ee;">
       <div style="max-width:680px; margin:0 auto; padding:72px 22px 96px; text-align:center;">
         <div style="display:inline-block; background:#fffdf5; padding:12px; border:2px solid #14110d; box-shadow:0 16px 34px rgba(20,17,13,.22); margin-bottom:30px; transform:rotate(-2deg);">
           <div>{{ logoAboutEl }}</div>
         </div>
-        <h2 style="font:400 46px/0.92 'Anton'; text-transform:uppercase; letter-spacing:.02em; color:#14110d; margin-bottom:8px;">{{ aboutHeading }}</h2>
+        <h2 class="dd-overlayTitle" style="font:400 46px/0.92 'Anton'; text-transform:uppercase; letter-spacing:.02em; color:#14110d; margin-bottom:8px;">{{ aboutHeading }}</h2>
         <div style="font:400 26px/1 'Yellowtail',cursive; color:#d12b25; margin-bottom:18px;">{{ aboutScript }}</div>
         <div style="text-align:left; margin-bottom:28px; display:flex; flex-direction:column; gap:18px;">
           <sc-for list="{{ aboutParas }}" as="para" hint-placeholder-count="5">
-            <p style="font:400 22px/1.7 'Libre Baskerville',serif; color:#3a342a;">{{ para }}</p>
+            <p class="dd-aboutPara" style="font:400 22px/1.7 'Libre Baskerville',serif; color:#3a342a;">{{ para }}</p>
           </sc-for>
         </div>
         <a href="{{ youtubeUrl }}" target="_blank" rel="noopener" style="text-decoration:none; display:inline-flex; align-items:center; gap:10px; background:#d12b25; color:#f6f4ee; font:600 15px/1 'Oswald'; letter-spacing:.08em; text-transform:uppercase; padding:15px 26px; border-radius:3px; border:2px solid #14110d;">▶ Subscribe on YouTube</a>
@@ -294,8 +337,7 @@
 
 </div>
 
-<!-- ===== EDIT BUTTON ===== -->
-<div onClick="{{ openAdmin }}" style="position:fixed; left:20px; bottom:20px; z-index:1500; display:flex; align-items:center; gap:9px; background:#14110d; color:#f6f4ee; border:2px solid #e7b94e; font:600 13px/1 'Oswald',sans-serif; letter-spacing:.09em; text-transform:uppercase; padding:13px 18px; border-radius:3px; cursor:pointer; box-shadow:0 8px 22px rgba(0,0,0,.4);">✎ Edit Site</div>
+
 
 <!-- ===== ADMIN PANEL (built in logic) ===== -->
 {{ adminEl }}
@@ -305,13 +347,13 @@
 
 <!-- ===== VIDEO LIGHTBOX ===== -->
 <sc-if value="{{ video }}" hint-placeholder-val="{{ false }}">
-  <div onClick="{{ closeVideo }}" style="position:fixed; inset:0; z-index:1000; background:rgba(12,9,6,.88); display:flex; align-items:center; justify-content:center; padding:22px;">
+  <div onClick="{{ closeVideo }}" class="dd-videoWrap" style="position:fixed; inset:0; z-index:1000; background:rgba(12,9,6,.88); display:flex; align-items:center; justify-content:center; padding:22px;">
     <div onClick="{{ stop }}" style="width:100%; max-width:800px; background:#fffdf5; border:4px solid #14110d; overflow:hidden; box-shadow:0 30px 70px rgba(0,0,0,.65);">
-      <div style="display:flex; align-items:center; gap:13px; padding:13px 18px; background:#d12b25; border-bottom:4px solid #14110d;">
+      <div class="dd-videoHead" style="display:flex; align-items:center; gap:13px; padding:13px 18px; background:#d12b25; border-bottom:4px solid #14110d;">
         {{ logoVideoEl }}
         <div style="flex:1; min-width:0;">
-          <div style="font:400 24px/0.95 'Anton'; text-transform:uppercase; color:#f6f4ee;">{{ videoName }}</div>
-          <div style="font:600 16px/1 'Oswald'; color:#f6d9a3; letter-spacing:.1em; text-transform:uppercase; margin-top:5px;">{{ videoMeta }}</div>
+          <div class="dd-videoTitle" style="font:400 24px/0.95 'Anton'; text-transform:uppercase; color:#f6f4ee;">{{ videoName }}</div>
+          <div class="dd-videoMeta" style="font:600 16px/1 'Oswald'; color:#f6d9a3; letter-spacing:.1em; text-transform:uppercase; margin-top:5px;">{{ videoMeta }}</div>
         </div>
         <div style="width:54px; height:54px; border-radius:50%; background:#2f6b3f; border:2px solid #14110d; display:flex; align-items:center; justify-content:center; font:600 21px/1 'Oswald'; color:#f6f4ee; flex:none;">{{ videoScore }}</div>
         <div onClick="{{ closeVideo }}" style="width:38px; height:38px; border-radius:50%; background:#14110d; color:#f6f4ee; display:flex; align-items:center; justify-content:center; font:400 19px/1 'Oswald'; cursor:pointer; flex:none;">✕</div>
@@ -323,8 +365,8 @@
         </a>
         <iframe src="{{ videoSrc }}" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="position:absolute; inset:0; width:100%; height:100%; border:none;"></iframe>
       </div>
-      <div style="padding:15px 18px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
-        <div style="flex:1; min-width:200px; font:italic 400 20px/1.5 'Libre Baskerville',serif; color:#5a5044;">{{ videoVerdict }}</div>
+      <div class="dd-videoFoot" style="padding:15px 18px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+        <div class="dd-videoVerdict" style="flex:1; min-width:200px; font:italic 400 20px/1.5 'Libre Baskerville',serif; color:#5a5044;">{{ videoVerdict }}</div>
         <a href="{{ videoUrl }}" target="_blank" rel="noopener" style="text-decoration:none; white-space:nowrap; background:#d12b25; color:#f6f4ee; font:600 12px/1 'Oswald'; letter-spacing:.06em; text-transform:uppercase; padding:12px 18px; border-radius:3px; border:2px solid #14110d;">Watch on YouTube ↗</a>
       </div>
     </div>
@@ -359,7 +401,7 @@ class Component extends DCLogic {
     };
   }
 
-  ASSET_IDS = { 'assets/logo-full.jpg':'logo', 'assets/feat-king.png':'heroFeat', 'assets/shop-2.png':'heroShop2', 'assets/shop-3.png':'heroShop3', 'assets/shop-4.png':'heroShop4', 'assets/shop-1.png':'heroShop1', 'assets/pin.png':'pin' };
+  ASSET_IDS = { 'assets/logo-full.jpg':'logo', 'assets/feat-king.png':'heroFeat', 'assets/shop-2.png':'heroShop2', 'assets/shop-3.png':'heroShop3', 'assets/shop-4.png':'heroShop4', 'assets/style-new-york.jpg':'styleNewYork', 'assets/style-cleveland-crimp.jpg':'styleClevelandCrimp', 'assets/style-neapolitan.jpg':'styleNeapolitan', 'assets/style-detroit.jpg':'styleDetroit', 'assets/style-tavern.jpg':'styleTavern', 'assets/style-sicilian.jpg':'styleSicilian', 'assets/style-deep-dish.jpg':'styleDeepDish', 'assets/shop-1.png':'heroShop1', 'assets/pin.png':'pin' };
   resolveAsset(u){ if(!u) return u; const id = this.ASSET_IDS[u]; if(id && window.__resources && window.__resources[id]) return window.__resources[id]; return u; }
 
   defaults(){
@@ -387,14 +429,13 @@ class Component extends DCLogic {
         { name:"Swinging Door", author:'', score:7.9, style:'Tavern', video:'https://www.youtube.com/watch?v=G5RELETqGSU', lat:41.451, lng:-81.728, verdict:"Crispy bar pie with serious nostalgia points." },
       ],
       styleDefs:[
-        { name:'New York',   color:'#d12b25', image:'', desc:"Wide, foldable slices — thin but pliable, sweet-leaning sauce, low-moisture mozzarella." },
-        { name:'Detroit',    color:'#e0a82e', image:'', desc:"Rectangular and thick, airy crumb, crispy cheese frico edges, sauce striped on top." },
-        { name:'Neapolitan', color:'#2f6b3f', image:'', desc:"Wood-fired and blistered, leopard-spotted cornicione, soft wet center. Fork required." },
-        { name:'Tavern',     color:'#14110d', image:'', desc:"Cracker-thin and cut into squares — the Midwest 'party cut' bar classic." },
-        { name:'Sicilian',   color:'#7a4a1f', image:'', desc:"Thick, square, focaccia-like base with a chewy, oily, golden bottom." },
-        { name:'Deep Dish',  color:'#b06a1f', image:'', desc:"Chicago's tall, buttery pastry crust packed with cheese and a chunky tomato top." },
-        { name:'Coal Fired', color:'#4a4540', image:'', desc:"Blistered, smoky char from an 800°+ coal oven — crisp, dry, a little ashy." },
-        { name:'Wood Fired', color:'#8a3b1f', image:'', desc:"Fast-baked over hardwood for a fragrant, charred, airy crust." },
+        { name:'New York', color:'#d12b25', image:'assets/style-new-york.jpg', desc:"New York-style pizza is defined by its large, wide slices, thin foldable crust, and a perfect balance of crispy edges and a chewy interior. It traditionally features a simple, flavorful tomato sauce, shredded low-moisture mozzarella cheese, and is baked in a high-temp oven." },
+        { name:'Cleveland Crimp', color:'#d12b25', image:'assets/style-cleveland-crimp.jpg', desc:"The Cleveland Crimp (also known as a pinched or rolled crust) is a signature pizza-making technique hailing from the Italian pizzerias of Parma and the greater Cleveland, OH area. Instead of a flat or hand-tossed outer edge, pizzaiolos pinch, roll, and fold the dough inward along the rim. This creates a distinct, braided rope-like ridge." },
+        { name:'Neapolitan', color:'#2f6b3f', image:'assets/style-neapolitan.jpg', desc:"Neapolitan pizza is a traditional Italian pizza from Naples, characterized by a soft, thin, chewy crust with high, airy edges (cornicione) that are blistered from being cooked quickly in a very hot, wood-fired oven (around 900°F). Authentic versions use simple, high-quality toppings like San Marzano tomatoes, fresh mozzarella (di bufala or fior di latte), fresh basil, and olive oil, with the classic variations being the Margherita and the cheese-less Marinara." },
+        { name:'Detroit', color:'#e0a82e', image:'assets/style-detroit.jpg', desc:"Detroit-style pizza is a thick, square-cut pan pizza originating from Motor City. It features an airy, focaccia-like crust with a crackly, fried bottom, a layer of Wisconsin brick cheese that bakes into caramelized crunchy edges, and is finished with signature \"racing stripes\" of tomato sauce on top." },
+        { name:'Tavern', color:'#14110d', image:'assets/style-tavern.jpg', desc:"Tavern-style pizza is an ultra-thin, cracker-crisp crust pizza cut into small, bite-sized squares (known as a \"party cut\") rather than traditional triangles. Originating in the Chicago, this style is known for having ingredients, sauce, and cheese spread all the way to the absolute edges of the pie." },
+        { name:'Sicilian', color:'#7a4a1f', image:'assets/style-sicilian.jpg', desc:"Sicilian-style pizza features a thick, airy, focaccia-like dough baked in an oiled rectangular pan, yielding a crisp, fried bottom. Traditionally, it is topped with strong cheese (like caciocavallo), tomato sauce, onions, herbs, and breadcrumbs, and cut into square slices." },
+        { name:'Deep Dish', color:'#b06a1f', image:'assets/style-deep-dish.jpg', desc:"Deep dish pizza is a famous Chicago-style pie characterized by a high-edged crust baked in a deep, round pan. It is layered with a thick bed of mozzarella cheese, followed by meats and vegetables, and finally blanketed with a generous, chunky layer of crushed tomato sauce." },
       ],
     };
   }
@@ -771,7 +812,7 @@ class Component extends DCLogic {
         countLabel: cnt===0 ? 'Soon' : (cnt + (cnt===1?' spot':' spots')),
         open: ()=> this.goToStyle(s.name),
         imageEl: s.image
-          ? React.createElement('img', { src:s.image, alt:s.name, style:{ width:'100%', height:'100%', objectFit:'cover', display:'block' } })
+          ? React.createElement('img', { src:this.resolveAsset(s.image), alt:s.name, style:{ width:'100%', height:'100%', objectFit:'cover', display:'block' } })
           : React.createElement('div', { style:{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', textAlign:'center', padding:'10px', font:"600 10px/1.4 'Oswald',sans-serif", letterSpacing:'.08em', textTransform:'uppercase', color:'#b3a892' } }, 'Add a photo in Edit Site'),
       });
     });

@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="ext-resource-dependency" content="assets/pin.png" data-resource-id="pin" />
+<meta name="ext-resource-dependency" content="assets/logo-full.jpg" data-resource-id="logo" />
+<meta name="ext-resource-dependency" content="assets/feat-king.png" data-resource-id="heroFeat" />
+<meta name="ext-resource-dependency" content="assets/shop-2.png" data-resource-id="heroShop2" />
+<meta name="ext-resource-dependency" content="assets/shop-3.png" data-resource-id="heroShop3" />
+<meta name="ext-resource-dependency" content="assets/shop-4.png" data-resource-id="heroShop4" />
+<meta name="ext-resource-dependency" content="assets/shop-1.png" data-resource-id="heroShop1" />
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;500;600;700&family=Yellowtail&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:#14110d;}
+  .leaflet-container{background:#cfc4ad; font-family:'Oswald',sans-serif;}
+  .bw-map .leaflet-tile-pane{filter:grayscale(1) contrast(1.05) sepia(.12) brightness(1.03);}
+  .dd-scroll::-webkit-scrollbar{height:0;}
+  .dd-scroll{scrollbar-width:none;}
+  .dd-adminBody::-webkit-scrollbar{width:10px;}
+  .dd-adminBody::-webkit-scrollbar-thumb{background:#cfc4ad; border-radius:8px;}
+  @media (max-width:880px){
+    .dd-mapRow{flex-direction:column !important;}
+    .dd-side{flex-direction:row !important; flex-wrap:wrap !important;}
+    .dd-side > *{flex:1; min-width:240px;}
+    .dd-map{height:430px !important;}
+  }
+  @media (max-width:760px){
+    .dd-hero{min-height:0 !important;}
+    .dd-heroInner{flex-direction:column !important; min-height:0 !important; text-align:center !important; gap:22px !important; padding:34px 20px 40px !important; justify-content:center !important;}
+    .dd-heroText{max-width:100% !important;}
+    .dd-heroText p{margin-left:auto !important; margin-right:auto !important;}
+    .dd-heroScrim{background:linear-gradient(180deg, rgba(12,9,6,.46) 0%, rgba(12,9,6,.62) 100%) !important;}
+    .dd-heroLogo{display:inline-block !important; transform:rotate(-2deg) !important; order:-1;}
+    .dd-heroLogoImg{width:128px !important; height:128px !important;}
+    .dd-heroTitle{font-size:50px !important;}
+    .dd-heroKicker{letter-spacing:.22em !important;}
+    .dd-heroScript{font-size:32px !important;}
+    .dd-heroBlurb{font-size:23px !important;}
+    .dd-cta{width:100% !important; justify-content:center !important; padding:17px 24px !important; font-size:16px !important;}
+    .dd-wordmark{display:none !important;}
+    .dd-subscribe{padding:10px 13px !important; font-size:12px !important;}
+    .dd-headerBg{height:auto !important;}
+    .dd-headerInner{height:auto !important; flex-wrap:wrap !important; padding:9px 16px !important; row-gap:8px !important;}
+    .dd-nav{order:3; flex-basis:100%; margin-left:0 !important; justify-content:center; overflow-x:auto; gap:4px !important;}
+    .dd-navItem{font-size:14px !important; padding:7px 11px !important;}
+    .dd-subscribe{order:2;}
+    .dd-page{padding-top:128px !important;}
+    .dd-mapHead{flex-direction:column !important; align-items:stretch !important;}
+    .dd-search{min-width:0 !important; width:100% !important;}
+    .dd-filters{width:100%;}
+    .dd-filters select{flex:1; min-width:0;}
+    .dd-adminPanel{width:100vw !important;}
+
+    /* Ratings + Styles pages: stack cards on mobile */
+    .dd-overlayTitle{font-size:38px !important;}
+    .dd-overlaySub{font-size:17px !important;}
+
+    .dd-rankCard{flex-wrap:wrap !important; gap:12px !important; padding:12px !important;}
+    .dd-rankThumb{order:-1; width:100% !important; height:190px !important;}
+    .dd-rankNum{width:auto !important; font-size:30px !important;}
+    .dd-rankName{font-size:24px !important;}
+    .dd-rankMeta{font-size:13px !important;}
+    .dd-rankVerdict{font-size:16px !important;}
+    .dd-rankScore{width:52px !important; height:52px !important; font-size:19px !important;}
+
+    .dd-styleCard{flex-direction:column !important; min-height:0 !important;}
+    .dd-styleBar{width:100% !important; height:8px !important;}
+    .dd-styleImg{width:100% !important; height:190px !important; border-right:none !important; border-bottom:2px solid #14110d !important;}
+    .dd-styleBody{padding:14px 15px !important; gap:8px !important;}
+    .dd-styleName{font-size:22px !important;}
+    .dd-styleDesc{font-size:16px !important; line-height:1.55 !important;}
+  }
+  @media (max-width:380px){
+    .dd-heroTitle{font-size:40px !important;}
+  }
+</style>
+</helmet>
+
+<div class="dd-page" style="min-height:100vh; padding-top:80px; background:#f6f4ee;">
+
+  <!-- ===== FIXED HEADER ===== -->
+  <header style="position:fixed; top:0; left:0; right:0; z-index:100; box-shadow:0 3px 16px rgba(20,17,13,.28);">
+    <div class="dd-headerBg" style="height:66px; background-color:#f6f4ee;">
+      <div class="dd-headerInner" style="height:66px; max-width:1300px; margin:0 auto; display:flex; align-items:center; gap:14px; padding:0 22px;">
+        <div onClick="{{ goMap }}" style="display:flex; align-items:center; gap:12px; cursor:pointer;">
+          {{ logoHeaderEl }}
+          <span class="dd-wordmark" style="font:400 23px/1 'Anton',sans-serif; letter-spacing:.02em; text-transform:uppercase; color:#14110d;">Dough <span style="color:#d12b25;">&amp;</span> Disorder</span>
+        </div>
+        <nav class="dd-nav" style="margin-left:34px; display:flex; gap:4px;">
+          <sc-for list="{{ navItems }}" as="nav" hint-placeholder-count="4">
+            <div class="dd-navItem" onClick="{{ nav.go }}" style="{{ nav.style }}">{{ nav.label }}</div>
+          </sc-for>
+        </nav>
+        <a href="{{ youtubeUrl }}" target="_blank" rel="noopener" class="dd-subscribe" style="margin-left:auto; text-decoration:none; display:inline-flex; align-items:center; gap:9px; background:#d12b25; color:#f6f4ee; font:600 13px/1 'Oswald',sans-serif; letter-spacing:.08em; text-transform:uppercase; padding:11px 17px; border-radius:3px; border:2px solid #14110d;">
+          <span style="display:inline-flex; width:19px; height:14px; background:#f6f4ee; border-radius:2px; align-items:center; justify-content:center; color:#d12b25; font-size:8px;">▶</span> Subscribe
+        </a>
+      </div>
+    </div>
+    <div style="height:8px; background-image:conic-gradient(#14110d 25%, #f6f4ee 0 50%, #14110d 0 75%, #f6f4ee 0); background-size:12px 12px;"></div>
+  </header>
+
+  <!-- ===== HERO ===== -->
+  <section class="dd-hero" data-screen-label="Home" style="position:relative; min-height:632px; overflow:hidden; background:#14110d;">
+    <div style="position:absolute; inset:0; display:flex; gap:3px; background:#14110d;">
+      {{ heroImg0El }}
+      {{ heroImg1El }}
+      {{ heroImg2El }}
+      {{ heroImg3El }}
+      {{ heroImg4El }}
+    </div>
+    <div class="dd-heroScrim" style="position:absolute; inset:0; background:linear-gradient(90deg, rgba(12,9,6,.86) 0%, rgba(12,9,6,.58) 40%, rgba(12,9,6,.14) 72%, rgba(12,9,6,0) 100%);"></div>
+    <div style="position:absolute; inset:0; background:linear-gradient(0deg, rgba(12,9,6,.55) 0%, transparent 36%);"></div>
+    <div class="dd-heroInner" style="position:relative; z-index:2; max-width:1300px; margin:0 auto; min-height:632px; display:flex; align-items:center; justify-content:space-between; gap:40px; padding:64px 22px;">
+      <div class="dd-heroText" style="max-width:620px;">
+        <div class="dd-heroKicker" style="font:600 12px/1 'Oswald',sans-serif; letter-spacing:.34em; text-transform:uppercase; color:#e7b94e;">{{ heroKicker }}</div>
+        <div class="dd-heroScript" style="font:400 38px/1 'Yellowtail',cursive; color:#f6f4ee; margin:16px 0 2px; transform:rotate(-2deg);">{{ heroScript }}</div>
+        <h1 class="dd-heroTitle" style="font:400 78px/0.92 'Anton',sans-serif; letter-spacing:.01em; text-transform:uppercase; color:#f6f4ee; text-shadow:0 3px 22px rgba(0,0,0,.6);">{{ heroTitleLead }} <span style="color:#fff; background:#d12b25; padding:0 12px; box-decoration-break:clone; -webkit-box-decoration-break:clone;">{{ heroTitleHighlight }}</span></h1>
+        <p class="dd-heroBlurb" style="font:italic 400 26px/1.6 'Libre Baskerville',serif; color:#e8ddca; margin:22px 0 0; max-width:486px; text-shadow:0 2px 10px rgba(0,0,0,.7);">{{ heroBlurb }}</p>
+        <div class="dd-cta" onClick="{{ scrollToMap }}" style="margin-top:30px; cursor:pointer; display:inline-flex; align-items:center; gap:10px; background:#d12b25; color:#f6f4ee; font:600 15px/1 'Oswald',sans-serif; letter-spacing:.08em; text-transform:uppercase; padding:16px 28px; border-radius:3px; border:2px solid #14110d; box-shadow:5px 5px 0 rgba(0,0,0,.45);">{{ heroCta }}</div>
+      </div>
+      <div class="dd-heroLogo" style="flex:none; background:#fffdf5; padding:12px; border:2px solid #14110d; box-shadow:0 24px 54px rgba(0,0,0,.45); transform:rotate(3deg);">
+        <div>{{ logoHeroEl }}</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MAP SECTION ===== -->
+  <section id="dd-map-section" style="max-width:1300px; margin:0 auto; padding:80px 22px 96px;">
+    <div class="dd-mapHead" style="display:flex; align-items:flex-end; justify-content:space-between; gap:18px; flex-wrap:wrap; margin-bottom:34px;">
+      <div>
+        <div style="width:44px; height:4px; background:#d12b25; margin-bottom:18px;"></div>
+        <h2 style="font:400 44px/0.95 'Anton',sans-serif; letter-spacing:.02em; text-transform:uppercase; color:#14110d;">{{ mapHeading }}</h2>
+        <p style="margin-top:8px; font:italic 400 23px/1.4 'Libre Baskerville',serif; color:#5a5044;">{{ mapSubtitle }}</p>
+      </div>
+      <div class="dd-search" style="display:flex; align-items:center; gap:9px; background:#fffdf5; border:2px solid #14110d; border-radius:3px; padding:11px 15px; min-width:244px;">
+        <span style="color:#d12b25; font-size:15px;">⌕</span>
+        <input value="{{ query }}" onInput="{{ onSearch }}" placeholder="Search a place…" style="border:none; outline:none; background:transparent; font:500 14px/1 'Oswald'; color:#14110d; width:100%;">
+      </div>
+    </div>
+
+    <div class="dd-filters" style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:18px;">
+      <select value="{{ styleFilter }}" onChange="{{ onStyle }}" style="appearance:none; -webkit-appearance:none; font:600 13px/1 'Oswald',sans-serif; letter-spacing:.05em; text-transform:uppercase; color:#14110d; border:2px solid #14110d; border-radius:3px; padding:12px 40px 12px 15px; cursor:pointer; background:#fffdf5 url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2314110d' stroke-width='2'/%3E%3C/svg%3E&quot;) no-repeat right 14px center;">
+        <option value="ALL">All Styles</option>
+        <sc-for list="{{ styleOptions }}" as="o" hint-placeholder-count="8">
+          <option value="{{ o.name }}">{{ o.name }}</option>
+        </sc-for>
+      </select>
+      <select value="{{ scoreFilter }}" onChange="{{ onScore }}" style="appearance:none; -webkit-appearance:none; font:600 13px/1 'Oswald',sans-serif; letter-spacing:.05em; text-transform:uppercase; color:#14110d; border:2px solid #14110d; border-radius:3px; padding:12px 40px 12px 15px; cursor:pointer; background:#fffdf5 url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2314110d' stroke-width='2'/%3E%3C/svg%3E&quot;) no-repeat right 14px center;">
+        <option value="ALL">All Scores</option>
+        <option value="8">8+ · Elite</option>
+        <option value="6">6–8 · Solid</option>
+        <option value="0">Under 6 · Skip it</option>
+      </select>
+    </div>
+
+    <div class="dd-mapRow" style="display:flex; gap:20px; align-items:stretch;">
+      <div style="flex:1.7; min-width:0;">
+        <div class="dd-map" style="position:relative; height:564px; border:5px solid #14110d; box-shadow:0 12px 30px rgba(20,17,13,.28);">
+          <div id="dd-map" class="bw-map" style="position:absolute; inset:0; z-index:0;"></div>
+        </div>
+      </div>
+      <div class="dd-side" style="flex:1; min-width:268px; display:flex; flex-direction:column; gap:16px;">
+        <div onClick="{{ featured.open }}" style="background:#fffdf5; border:2px solid #14110d; overflow:hidden; box-shadow:4px 4px 0 #14110d; cursor:pointer;">
+          <div style="position:relative; height:160px; background:#ddd;">
+            {{ featuredThumbEl }}
+            <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;"><div style="width:54px; height:54px; border-radius:50%; background:rgba(209,43,37,.95); border:2px solid #f6f4ee; display:flex; align-items:center; justify-content:center; color:#f6f4ee; font-size:18px;">▶</div></div>
+            <div style="position:absolute; top:10px; left:10px; background:#14110d; color:#e7b94e; font:600 10px/1 'Oswald'; letter-spacing:.14em; padding:6px 9px; text-transform:uppercase;">★ Top Rated</div>
+          </div>
+          <div style="padding:15px 16px 16px; display:flex; gap:13px; align-items:flex-start;">
+            <div style="flex:1; min-width:0;">
+              <div style="font:400 24px/0.95 'Anton'; text-transform:uppercase; color:#14110d;">{{ featured.name }}</div>
+              <div style="font:600 16px/1 'Oswald'; color:#9a8a6e; margin:7px 0 9px; letter-spacing:.1em; text-transform:uppercase;">{{ featured.metaLine }}</div>
+              <div style="font:italic 400 18px/1.45 'Libre Baskerville',serif; color:#5a5044;">{{ featured.verdict }}</div>
+            </div>
+            <div style="width:56px; height:56px; border-radius:50%; background:#2f6b3f; border:2px solid #14110d; display:flex; align-items:center; justify-content:center; font:600 21px/1 'Oswald'; color:#f6f4ee; flex:none;">{{ featured.scoreStr }}</div>
+          </div>
+        </div>
+        <div style="background:#fffdf5; border:2px solid #14110d; padding:16px 18px; box-shadow:4px 4px 0 #14110d;">
+          <div style="font:400 20px/1 'Anton'; text-transform:uppercase; letter-spacing:.03em; color:#14110d; margin-bottom:14px;">The Scale</div>
+          <div style="display:flex; flex-direction:column; gap:11px; font:600 20px/1.1 'Oswald'; color:#5a5044; text-transform:uppercase; letter-spacing:.03em;">
+            <div style="display:flex; align-items:center; gap:12px;"><span style="width:34px;height:34px;border-radius:50%;background:#2f6b3f;border:2px solid #14110d;color:#fff;display:flex;align-items:center;justify-content:center;font:600 13px/1 'Oswald';flex:none;">8+</span> Elite — drop everything</div>
+            <div style="display:flex; align-items:center; gap:12px;"><span style="width:34px;height:34px;border-radius:50%;background:#e0a82e;border:2px solid #14110d;color:#14110d;display:flex;align-items:center;justify-content:center;font:600 11px/1 'Oswald';flex:none;">6–8</span> Solid — worth a stop</div>
+            <div style="display:flex; align-items:center; gap:12px;"><span style="width:34px;height:34px;border-radius:50%;background:#d12b25;border:2px solid #14110d;color:#fff;display:flex;align-items:center;justify-content:center;font:600 13px/1 'Oswald';flex:none;">&lt;6</span> Skip it</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer style="background:#14110d; color:#e8ddca;">
+    <div style="max-width:1300px; margin:0 auto; padding:52px 22px; display:flex; align-items:center; gap:18px; flex-wrap:wrap;">
+      {{ logoFooterEl }}
+      <div>
+        <div style="font:400 26px/1 'Anton'; text-transform:uppercase; color:#f6f4ee;">Dough <span style="color:#d12b25;">&amp;</span> Disorder</div>
+        <div style="font:italic 400 20px/1.2 'Libre Baskerville',serif; color:#a8997f; margin-top:6px;">{{ footerTagline }}</div>
+      </div>
+      <a href="{{ youtubeUrl }}" target="_blank" rel="noopener" style="margin-left:auto; text-decoration:none; display:inline-flex; align-items:center; gap:9px; background:#d12b25; color:#f6f4ee; font:600 13px/1 'Oswald'; letter-spacing:.08em; text-transform:uppercase; padding:13px 20px; border-radius:3px;">▶ Subscribe on YouTube</a>
+    </div>
+  </footer>
+
+  <!-- ===== PIZZA RATINGS OVERLAY ===== -->
+  <sc-if value="{{ isRatings }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Pizza Ratings" style="position:fixed; inset:0; z-index:60; padding-top:80px; overflow-y:auto; background:#f6f4ee;">
+      <div>
+        <div style="max-width:800px; margin:0 auto; padding:64px 22px 0; text-align:center;">
+          <h2 class="dd-overlayTitle" style="font:400 50px/0.92 'Anton'; text-transform:uppercase; letter-spacing:.02em; color:#14110d;">{{ ratingsHeading }}</h2>
+          <p class="dd-overlaySub" style="font:italic 400 21px/1.4 'Libre Baskerville',serif; color:#5a5044; margin-top:10px;">{{ ratingsSubtitle }}</p>
+        </div>
+      </div>
+      <div style="max-width:800px; margin:0 auto; padding:44px 22px 96px;">
+        <div style="display:flex; flex-direction:column; gap:28px;">
+          <sc-for list="{{ ranked }}" as="r" hint-placeholder-count="3">
+            <div onClick="{{ r.open }}" class="dd-rankCard" style="display:flex; align-items:center; gap:20px; background:#fffdf5; border:2px solid #14110d; padding:18px; cursor:pointer; box-shadow:4px 4px 0 #14110d;">
+              <div class="dd-rankNum" style="font:400 46px/1 'Anton'; color:#d12b25; width:56px; text-align:center; flex:none;">{{ r.rankStr }}</div>
+              <div class="dd-rankThumb" style="position:relative; width:min(300px,40%); height:185px; overflow:hidden; flex:none; border:2px solid #14110d;">
+                {{ r.thumbEl }}
+                <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;"><span style="width:50px; height:50px; border-radius:50%; background:rgba(209,43,37,.94); color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px;">▶</span></div>
+              </div>
+              <div style="flex:1; min-width:0;">
+                <div class="dd-rankName" style="font:400 30px/0.95 'Anton'; text-transform:uppercase; color:#14110d;">{{ r.name }}</div>
+                <div class="dd-rankMeta" style="font:600 16px/1 'Oswald'; color:#9a8a6e; margin:7px 0 8px; letter-spacing:.1em; text-transform:uppercase;">{{ r.metaLine }}</div>
+                <div class="dd-rankVerdict" style="font:italic 400 18px/1.4 'Libre Baskerville',serif; color:#5a5044; max-width:460px;">{{ r.verdict }}</div>
+              </div>
+              <div class="dd-rankScore" style="width:74px; height:74px; border-radius:50%; border:2px solid #14110d; display:flex; align-items:center; justify-content:center; font:600 27px/1 'Oswald'; color:#f6f4ee; flex:none; background:{{ r.scoreColor }};">{{ r.scoreStr }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== PIZZA STYLES OVERLAY ===== -->
+  <sc-if value="{{ isStyles }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Pizza Styles" style="position:fixed; inset:0; z-index:60; padding-top:80px; overflow-y:auto; background:#f6f4ee;">
+      <div>
+        <div style="max-width:920px; margin:0 auto; padding:64px 22px 0; text-align:center;">
+          <h2 class="dd-overlayTitle" style="font:400 50px/0.92 'Anton'; text-transform:uppercase; letter-spacing:.02em; color:#14110d;">{{ stylesHeading }}</h2>
+          <p class="dd-overlaySub" style="font:italic 400 21px/1.4 'Libre Baskerville',serif; color:#5a5044; margin-top:10px;">{{ stylesSubtitle }}</p>
+        </div>
+      </div>
+      <div style="max-width:840px; margin:0 auto; padding:44px 22px 96px;">
+        <div style="display:flex; flex-direction:column; gap:28px;">
+          <sc-for list="{{ styles }}" as="s" hint-placeholder-count="6">
+            <div onClick="{{ s.open }}" class="dd-styleCard" style="display:flex; align-items:stretch; background:#fffdf5; border:2px solid #14110d; overflow:hidden; box-shadow:4px 4px 0 #14110d; cursor:pointer; min-height:248px;">
+              <div class="dd-styleBar" style="width:8px; background:{{ s.color }}; flex:none;"></div>
+              <div class="dd-styleImg" style="width:min(376px,44%); flex:none; border-right:2px solid #14110d; background:#e9e7e2;">
+                {{ s.imageEl }}
+              </div>
+              <div class="dd-styleBody" style="flex:1; min-width:0; padding:16px 18px; display:flex; flex-direction:column; gap:9px;">
+                <div style="display:flex; align-items:center; gap:11px; flex-wrap:wrap;">
+                  <div class="dd-styleName" style="font:400 26px/0.95 'Anton'; text-transform:uppercase; color:#14110d;">{{ s.name }}</div>
+                  <div style="font:600 15px/1 'Oswald'; letter-spacing:.08em; text-transform:uppercase; color:#fffdf5; background:{{ s.color }}; padding:5px 10px;">{{ s.countLabel }}</div>
+                </div>
+                <div class="dd-styleDesc" style="font:400 20px/1.55 'Libre Baskerville',serif; color:#5a5044;">{{ s.desc }}</div>
+                <div style="margin-top:auto; font:600 16px/1 'Oswald'; letter-spacing:.12em; text-transform:uppercase; color:#d12b25;">See these on the map →</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== ABOUT OVERLAY ===== -->
+  <sc-if value="{{ isAbout }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="About" style="position:fixed; inset:0; z-index:60; padding-top:80px; overflow-y:auto; background:#f6f4ee;">
+      <div style="max-width:680px; margin:0 auto; padding:72px 22px 96px; text-align:center;">
+        <div style="display:inline-block; background:#fffdf5; padding:12px; border:2px solid #14110d; box-shadow:0 16px 34px rgba(20,17,13,.22); margin-bottom:30px; transform:rotate(-2deg);">
+          <div>{{ logoAboutEl }}</div>
+        </div>
+        <h2 style="font:400 46px/0.92 'Anton'; text-transform:uppercase; letter-spacing:.02em; color:#14110d; margin-bottom:8px;">{{ aboutHeading }}</h2>
+        <div style="font:400 26px/1 'Yellowtail',cursive; color:#d12b25; margin-bottom:18px;">{{ aboutScript }}</div>
+        <div style="text-align:left; margin-bottom:28px; display:flex; flex-direction:column; gap:18px;">
+          <sc-for list="{{ aboutParas }}" as="para" hint-placeholder-count="5">
+            <p style="font:400 22px/1.7 'Libre Baskerville',serif; color:#3a342a;">{{ para }}</p>
+          </sc-for>
+        </div>
+        <a href="{{ youtubeUrl }}" target="_blank" rel="noopener" style="text-decoration:none; display:inline-flex; align-items:center; gap:10px; background:#d12b25; color:#f6f4ee; font:600 15px/1 'Oswald'; letter-spacing:.08em; text-transform:uppercase; padding:15px 26px; border-radius:3px; border:2px solid #14110d;">▶ Subscribe on YouTube</a>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+
+<!-- ===== EDIT BUTTON ===== -->
+<div onClick="{{ openAdmin }}" style="position:fixed; left:20px; bottom:20px; z-index:1500; display:flex; align-items:center; gap:9px; background:#14110d; color:#f6f4ee; border:2px solid #e7b94e; font:600 13px/1 'Oswald',sans-serif; letter-spacing:.09em; text-transform:uppercase; padding:13px 18px; border-radius:3px; cursor:pointer; box-shadow:0 8px 22px rgba(0,0,0,.4);">✎ Edit Site</div>
+
+<!-- ===== ADMIN PANEL (built in logic) ===== -->
+{{ adminEl }}
+
+<!-- ===== PASSWORD PROMPT (built in logic) ===== -->
+{{ pwEl }}
+
+<!-- ===== VIDEO LIGHTBOX ===== -->
+<sc-if value="{{ video }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeVideo }}" style="position:fixed; inset:0; z-index:1000; background:rgba(12,9,6,.88); display:flex; align-items:center; justify-content:center; padding:22px;">
+    <div onClick="{{ stop }}" style="width:100%; max-width:800px; background:#fffdf5; border:4px solid #14110d; overflow:hidden; box-shadow:0 30px 70px rgba(0,0,0,.65);">
+      <div style="display:flex; align-items:center; gap:13px; padding:13px 18px; background:#d12b25; border-bottom:4px solid #14110d;">
+        {{ logoVideoEl }}
+        <div style="flex:1; min-width:0;">
+          <div style="font:400 24px/0.95 'Anton'; text-transform:uppercase; color:#f6f4ee;">{{ videoName }}</div>
+          <div style="font:600 16px/1 'Oswald'; color:#f6d9a3; letter-spacing:.1em; text-transform:uppercase; margin-top:5px;">{{ videoMeta }}</div>
+        </div>
+        <div style="width:54px; height:54px; border-radius:50%; background:#2f6b3f; border:2px solid #14110d; display:flex; align-items:center; justify-content:center; font:600 21px/1 'Oswald'; color:#f6f4ee; flex:none;">{{ videoScore }}</div>
+        <div onClick="{{ closeVideo }}" style="width:38px; height:38px; border-radius:50%; background:#14110d; color:#f6f4ee; display:flex; align-items:center; justify-content:center; font:400 19px/1 'Oswald'; cursor:pointer; flex:none;">✕</div>
+      </div>
+      <div style="position:relative; width:100%; padding-top:56.25%; background:#000;">
+        <a href="{{ videoUrl }}" target="_blank" rel="noopener" style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; text-decoration:none; background:#000 center/cover no-repeat; background-image:{{ videoPoster }};">
+          <div style="width:66px; height:66px; border-radius:50%; background:rgba(209,43,37,.96); border:3px solid #f6f4ee; display:flex; align-items:center; justify-content:center; color:#f6f4ee; font-size:24px;">▶</div>
+          <div style="font:600 12px/1 'Oswald',sans-serif; letter-spacing:.1em; text-transform:uppercase; color:#f6f4ee; background:rgba(20,17,13,.7); padding:8px 14px; border-radius:3px;">Watch on YouTube ↗</div>
+        </a>
+        <iframe src="{{ videoSrc }}" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="position:absolute; inset:0; width:100%; height:100%; border:none;"></iframe>
+      </div>
+      <div style="padding:15px 18px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:200px; font:italic 400 20px/1.5 'Libre Baskerville',serif; color:#5a5044;">{{ videoVerdict }}</div>
+        <a href="{{ videoUrl }}" target="_blank" rel="noopener" style="text-decoration:none; white-space:nowrap; background:#d12b25; color:#f6f4ee; font:600 12px/1 'Oswald'; letter-spacing:.06em; text-transform:uppercase; padding:12px 18px; border-radius:3px; border:2px solid #14110d;">Watch on YouTube ↗</a>
+      </div>
+    </div>
+  </div>
+</sc-if>
+</x-dc>
+<template id="__bundler_thumbnail" data-bg-color="#d12b25">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#d12b25"/>
+    <path d="M600 250 L760 560 Q600 620 440 560 Z" fill="#f6f4ee" stroke="#14110d" stroke-width="14" stroke-linejoin="round"/>
+    <circle cx="600" cy="360" r="26" fill="#d12b25"/>
+    <circle cx="540" cy="450" r="22" fill="#e0a82e"/>
+    <circle cx="655" cy="460" r="22" fill="#d12b25"/>
+    <circle cx="600" cy="520" r="18" fill="#2f6b3f"/>
+  </svg>
+</template>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:820}}">
+class Component extends DCLogic {
+  KEY = 'dd-content-v2';
+  EDIT_PASSWORD = 'dough2024';   // ← change this to set your own Edit Site password
+  STYLE_PRESETS = ['#d12b25','#e0a82e','#2f6b3f','#14110d','#7a4a1f','#b06a1f','#4a4540','#8a3b1f','#1f5f7a','#9a5b1f'];
+
+  constructor(props){
+    super(props);
+    let authed = false;
+    try { authed = sessionStorage.getItem('dd-edit-authed')==='1'; } catch(e){}
+    this.state = {
+      view:'map', styleFilter:'ALL', scoreFilter:'ALL', query:'', video:null,
+      admin:false, adminTab:'reviews',
+      authed, pwPrompt:false, pwInput:'', pwError:'',
+      content: this.load(),
+    };
+  }
+
+  ASSET_IDS = { 'assets/logo-full.jpg':'logo', 'assets/feat-king.png':'heroFeat', 'assets/shop-2.png':'heroShop2', 'assets/shop-3.png':'heroShop3', 'assets/shop-4.png':'heroShop4', 'assets/shop-1.png':'heroShop1', 'assets/pin.png':'pin' };
+  resolveAsset(u){ if(!u) return u; const id = this.ASSET_IDS[u]; if(id && window.__resources && window.__resources[id]) return window.__resources[id]; return u; }
+
+  defaults(){
+    return {
+      logo:'assets/logo-full.jpg',
+      youtube:'https://www.youtube.com/@DoughAndDisorder',
+      heroImages:['assets/feat-king.png','assets/shop-2.png','assets/shop-3.png','assets/shop-4.png','assets/shop-1.png'],
+      hero:{
+        kicker:'Est. 2024 · Cleveland, Ohio',
+        script:'the hunt for the',
+        titleLead:'Greatest',
+        titleHighlight:'Slice',
+        blurb:'A neighborhood pizza crawl — corner ovens, neon signs, and decades of grease-stained glory, mapped and ranked one honest score at a time.',
+        cta:'Explore the map ↓',
+      },
+      nav:{ map:'Map', ratings:'Pizza Ratings', styles:'Pizza Styles', about:'About' },
+      map:{ heading:"Where We've Eaten", subtitle:'Tap a pin to roll the tape. Filter by style or search a spot by name.' },
+      ratings:{ badge:'Cleveland, OH', heading:'The Slice Standings', subtitle:"Every spot we've reviewed, ranked by score. More cities coming soon." },
+      styles:{ heading:'Know Your Slice', subtitle:"Every review is tagged with a style. Here's the cheat sheet." },
+      about:{ heading:'The Mission', script:'no fork, no mercy', body:"Dough & Disorder is on a mission to hunt down the best pizza in Cleveland — and beyond. We grade in the spirit of the old neighborhood slice shops: with honesty and integrity, every spot plotted on the map so you always know where the good slices are. Pin by pin, we're mapping every great shop — until cholesterol wins.\n\nMy love of pizza started with Friday night pizza with the family — eating at the corner parlor, drinking a cold Coke, and playing Pac-Man for four hours straight. Later it was the cheap college pizza delivered to fuel late-night study sessions. And now it's showing my kids the different styles and watching their eyes light up when they bite into the perfect slice. There's nothing like it.\n\nMy philosophy is simple: pizza can be good no matter where you buy it. But no gas station, franchise, or frozen boxed pie can beat a corner mom-and-pop. Flop or no-flop crust, sweet or savory sauce, provolone or low-moisture mozzarella — none of it matters, as long as it agrees with my palate.\n\nI lean toward the Cleveland traditional slice and New York style. I'll rate the rest, but they probably won't score as high as my two first loves.\n\nIn my opinion, five key variables can make or break a slice: the amount of salt, the quality and quantity of the sauce, the type of cheese, the length of the dough fermentation, and the quality of the oven. Each one can dramatically affect a pie's score and ranking." },
+      footer:{ tagline:'Cleveland, OH · the search for the perfect slice' },
+      reviews:[
+        { name:"Lil Ronnie's", author:'', score:8.4, style:'Tavern', video:'https://www.youtube.com/watch?v=PVB-qN3YB_A', lat:41.470, lng:-81.701, verdict:"Cracker-thin and edge-to-edge — corner-bar pizza done right." },
+        { name:"Gina's Pizza", author:'', score:8.0, style:'New York', video:'https://www.youtube.com/watch?v=7Ec9BzWyrlo', lat:41.486, lng:-81.800, verdict:"Big foldable slices with a clean, classic chew." },
+        { name:"Swinging Door", author:'', score:7.9, style:'Tavern', video:'https://www.youtube.com/watch?v=G5RELETqGSU', lat:41.451, lng:-81.728, verdict:"Crispy bar pie with serious nostalgia points." },
+      ],
+      styleDefs:[
+        { name:'New York',   color:'#d12b25', image:'', desc:"Wide, foldable slices — thin but pliable, sweet-leaning sauce, low-moisture mozzarella." },
+        { name:'Detroit',    color:'#e0a82e', image:'', desc:"Rectangular and thick, airy crumb, crispy cheese frico edges, sauce striped on top." },
+        { name:'Neapolitan', color:'#2f6b3f', image:'', desc:"Wood-fired and blistered, leopard-spotted cornicione, soft wet center. Fork required." },
+        { name:'Tavern',     color:'#14110d', image:'', desc:"Cracker-thin and cut into squares — the Midwest 'party cut' bar classic." },
+        { name:'Sicilian',   color:'#7a4a1f', image:'', desc:"Thick, square, focaccia-like base with a chewy, oily, golden bottom." },
+        { name:'Deep Dish',  color:'#b06a1f', image:'', desc:"Chicago's tall, buttery pastry crust packed with cheese and a chunky tomato top." },
+        { name:'Coal Fired', color:'#4a4540', image:'', desc:"Blistered, smoky char from an 800°+ coal oven — crisp, dry, a little ashy." },
+        { name:'Wood Fired', color:'#8a3b1f', image:'', desc:"Fast-baked over hardwood for a fragrant, charred, airy crust." },
+      ],
+    };
+  }
+
+  merge(d,s){
+    if(Array.isArray(d)) return Array.isArray(s)? s : d;
+    if(d && typeof d==='object'){
+      const o = Object.assign({}, d);
+      for(const k in (s||{})){ o[k] = (k in d) ? this.merge(d[k], s[k]) : s[k]; }
+      return o;
+    }
+    return (s===undefined ? d : s);
+  }
+
+  load(){
+    let stored = {};
+    try { stored = JSON.parse(localStorage.getItem(this.KEY) || '{}'); } catch(e){}
+    return this.merge(this.defaults(), stored);
+  }
+  save(c){ try { localStorage.setItem(this.KEY, JSON.stringify(c)); } catch(e){} }
+
+  mutate(fn){
+    const c = JSON.parse(JSON.stringify(this.state.content));
+    fn(c);
+    this.setState({ content:c });
+    this.save(c);
+  }
+  setPath(path, value){
+    this.mutate(c=>{
+      const ks = path.split('.');
+      let o = c;
+      for(let i=0;i<ks.length-1;i++) o = o[ks[i]];
+      o[ks[ks.length-1]] = value;
+    });
+  }
+  readImg(file, cb){ const r = new FileReader(); r.onload = ()=> cb(r.result); r.readAsDataURL(file); }
+
+  addReview(){ this.mutate(c=> c.reviews.push({ name:'New Spot', author:'', score:7.0, style:(c.styleDefs[0]&&c.styleDefs[0].name)||'New York', video:'', lat:41.49, lng:-81.69, verdict:'Your verdict here.' })); }
+  delReview(i){ this.mutate(c=> c.reviews.splice(i,1)); }
+  addStyle(){ this.mutate(c=> c.styleDefs.push({ name:'New Style', color:'#d12b25', image:'', desc:'Describe this style.' })); }
+  delStyle(i){ this.mutate(c=> c.styleDefs.splice(i,1)); }
+
+  doExport(){
+    const blob = new Blob([JSON.stringify(this.state.content,null,2)], { type:'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'dough-and-disorder-content.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=> URL.revokeObjectURL(a.href), 1500);
+  }
+  doImport(file){
+    const r = new FileReader();
+    r.onload = ()=>{
+      try {
+        const data = JSON.parse(r.result);
+        const c = this.merge(this.defaults(), data);
+        this.setState({ content:c }); this.save(c);
+        setTimeout(()=> this.syncMarkers(), 0);
+      } catch(e){ window.alert('Sorry — that file could not be read as site content.'); }
+    };
+    r.readAsText(file);
+  }
+  doReset(){
+    if(!window.confirm('Reset ALL content back to the original defaults? This cannot be undone.')) return;
+    try { localStorage.removeItem(this.KEY); } catch(e){}
+    const c = this.defaults();
+    this.setState({ content:c });
+    setTimeout(()=> this.syncMarkers(), 0);
+  }
+
+  SCORE(s){ s = Number(s)||0; return s>=8 ? '#2f6b3f' : s>=6 ? '#e0a82e' : '#d12b25'; }
+  parseId(u){
+    if(!u) return '';
+    const m = String(u).match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
+    if(m) return m[1];
+    const t = String(u).trim();
+    return /^[A-Za-z0-9_-]{11}$/.test(t) ? t : '';
+  }
+  thumb(id){ return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : ''; }
+  yt(id){ return id ? `https://www.youtube.com/watch?v=${id}` : '#'; }
+  metaLine(r){ const base = `Cleveland, OH · ${r.style} Style`; return r.author ? `${base} · ${r.author}` : base; }
+
+  componentDidMount(){
+    this._key = (e)=>{ if(e.key==='Escape') this.setState({ video:null, admin:false, pwPrompt:false }); };
+    window.addEventListener('keydown', this._key);
+    this._resize = ()=>{ if(this.map){ try{ this.map.invalidateSize(); }catch(e){} } };
+    window.addEventListener('resize', this._resize);
+    this.waitL(()=> this.initMap());
+    setTimeout(()=>{ try{ this.forceUpdate(); }catch(e){} }, 400);
+  }
+  componentWillUnmount(){ window.removeEventListener('keydown', this._key); window.removeEventListener('resize', this._resize); }
+
+  componentDidUpdate(_, prev){
+    if(!prev) return;
+    if(prev.styleFilter!==this.state.styleFilter || prev.scoreFilter!==this.state.scoreFilter || prev.query!==this.state.query || prev.content!==this.state.content) this.syncMarkers();
+  }
+
+  waitL(cb,n){ n=n||0; if(window.L) return cb(); if(n>100) return; setTimeout(()=>this.waitL(cb,n+1),100); }
+
+  initMap(){
+   try {
+    const el = document.getElementById('dd-map');
+    if(!el || el._leaflet_id) return;
+    const L = window.L;
+    this.map = L.map(el, { zoomControl:false, attributionControl:true, scrollWheelZoom:false })
+                .setView([41.469,-81.745], 11);
+    L.control.zoom({position:'bottomright'}).addTo(this.map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'© OpenStreetMap' }).addTo(this.map);
+    this.markers = [];
+    this.syncMarkers();
+    setTimeout(()=> { try{ this.map.invalidateSize(); }catch(e){} }, 250);
+   } catch(e){ console.warn('map init', e); }
+  }
+
+  syncMarkers(){
+    if(!this.map || !window.L) return;
+    const L = window.L;
+    (this.markers||[]).forEach(m=> this.map.removeLayer(m));
+    this.markers = [];
+    this.getFiltered().forEach(r=>{
+      const score = Number(r.score)||0;
+      const col = this.SCORE(score);
+      const html = `<div style="position:relative;width:42px;height:52px">
+        <img src="${(window.__resources&&window.__resources.pin)||'assets/pin.png'}" style="width:42px;height:52px;display:block;filter:drop-shadow(0 3px 3px rgba(0,0,0,.5))">
+        <div style="position:absolute;top:-7px;right:-9px;background:${col};color:#fff;font:700 11px/1 Oswald,sans-serif;padding:3px 5px;border-radius:9px;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.5)">${score.toFixed(1)}</div>
+      </div>`;
+      const icon = L.divIcon({ html, className:'', iconSize:[42,52], iconAnchor:[21,52], popupAnchor:[0,-48] });
+      const m = L.marker([Number(r.lat)||0, Number(r.lng)||0], { icon, title:r.name }).addTo(this.map);
+      m.on('click', ()=> this.openVideo(r));
+      this.markers.push(m);
+    });
+  }
+
+  getFiltered(){
+    const q = this.state.query.trim().toLowerCase();
+    const sf = this.state.styleFilter, sb = this.state.scoreFilter;
+    const okBand = (r)=>{ const s=Number(r.score)||0; return sb==='ALL' || (sb==='8' ? s>=8 : sb==='6' ? (s>=6 && s<8) : s<6); };
+    return this.state.content.reviews.filter(r => (sf==='ALL'||r.style===sf) && okBand(r) && (!q || (r.name||'').toLowerCase().includes(q)));
+  }
+
+  decorate(r){
+    const id = this.parseId(r.video);
+    const score = Number(r.score)||0;
+    return Object.assign({}, r, {
+      score, vid:id,
+      scoreStr: score.toFixed(1),
+      scoreColor: this.SCORE(score),
+      thumb: this.thumb(id),
+      metaLine: this.metaLine(r),
+      open: ()=> this.openVideo(r),
+    });
+  }
+
+  openVideo(r){ this.setState({ video:this.decorate(r) }); }
+  openAdmin(){ if(this.state.authed) this.setState({ admin:true }); else this.setState({ pwPrompt:true, pwInput:'', pwError:'' }); }
+  closeAdmin(){ this.setState({ admin:false }); }
+  submitPw(){
+    if(this.state.pwInput === this.EDIT_PASSWORD){
+      try { sessionStorage.setItem('dd-edit-authed','1'); } catch(e){}
+      this.setState({ authed:true, pwPrompt:false, pwInput:'', pwError:'', admin:true });
+    } else {
+      this.setState({ pwError:'Wrong password — try again.', pwInput:'' });
+    }
+  }
+  cancelPw(){ this.setState({ pwPrompt:false, pwInput:'', pwError:'' }); }
+
+  pwEl(){
+    if(!this.state.pwPrompt) return null;
+    const h = React.createElement;
+    const inp = { width:'100%', boxSizing:'border-box', font:"500 16px/1.3 'Oswald',sans-serif", color:'#14110d', background:'#fffdf5', border:'2px solid #14110d', borderRadius:'2px', padding:'12px 13px', outline:'none', textAlign:'center', letterSpacing:'.05em' };
+    const modal = h('div',{onClick:e=>e.stopPropagation(),style:{width:'100%',maxWidth:'380px',background:'#f1efe9',border:'4px solid #14110d',boxShadow:'0 30px 70px rgba(0,0,0,.6)'}},
+      h('div',{style:{background:'#14110d',color:'#f6f4ee',padding:'16px 18px',display:'flex',alignItems:'center',gap:'10px'}},
+        h('span',{style:{font:"400 24px/1 'Anton',sans-serif",textTransform:'uppercase',letterSpacing:'.02em'}},'🔒 Editors Only')),
+      h('div',{style:{padding:'20px 18px'}},
+        h('p',{style:{font:"italic 400 13px/1.5 'Libre Baskerville',serif",color:'#5a5044',margin:'0 0 14px',textAlign:'center'}},'Enter the password to edit this site.'),
+        h('input',{type:'password',autoFocus:true,value:this.state.pwInput,placeholder:'Password',
+          onChange:e=>this.setState({pwInput:e.target.value}),
+          onKeyDown:e=>{ if(e.key==='Enter') this.submitPw(); },
+          style:inp}),
+        this.state.pwError ? h('div',{style:{font:"600 11px/1.3 'Oswald',sans-serif",letterSpacing:'.04em',textTransform:'uppercase',color:'#d12b25',marginTop:'9px',textAlign:'center'}},this.state.pwError) : null,
+        h('div',{style:{display:'flex',gap:'9px',marginTop:'16px'}},
+          h('button',{onClick:()=>this.cancelPw(),style:{flex:1,font:"600 12px/1 'Oswald',sans-serif",letterSpacing:'.07em',textTransform:'uppercase',color:'#14110d',background:'transparent',border:'2px solid #14110d',borderRadius:'2px',padding:'12px',cursor:'pointer'}},'Cancel'),
+          h('button',{onClick:()=>this.submitPw(),style:{flex:1,font:"600 12px/1 'Oswald',sans-serif",letterSpacing:'.07em',textTransform:'uppercase',color:'#f6f4ee',background:'#d12b25',border:'2px solid #14110d',borderRadius:'2px',padding:'12px',cursor:'pointer'}},'Unlock'))));
+    const backdrop = h('div',{onClick:()=>this.cancelPw(),style:{position:'fixed',inset:0,zIndex:1700,background:'rgba(12,9,6,.7)',display:'flex',alignItems:'center',justifyContent:'center',padding:'22px'}}, modal);
+    return backdrop;
+  }
+
+  goToStyle(name){
+    this.setState({ view:'map', styleFilter:name });
+    setTimeout(()=>{
+      this.syncMarkers();
+      const el = document.getElementById('dd-map-section');
+      if(el){ const y = el.getBoundingClientRect().top + window.scrollY - 72; window.scrollTo({ top:y, behavior:'smooth' }); }
+    }, 50);
+  }
+
+  /* ============ ADMIN PANEL ============ */
+  adminEl(){
+    if(!this.state.admin) return null;
+    const h = React.createElement;
+    const c = this.state.content;
+    const tab = this.state.adminTab;
+
+    const lab = { display:'block', font:"600 10px/1.1 'Oswald',sans-serif", letterSpacing:'.1em', textTransform:'uppercase', color:'#9a8a6e', margin:'0 0 5px' };
+    const inp = { width:'100%', boxSizing:'border-box', font:"500 13px/1.3 'Oswald',sans-serif", color:'#14110d', background:'#fffdf5', border:'2px solid #14110d', borderRadius:'2px', padding:'9px 10px', outline:'none' };
+    const wrap = { display:'block', marginBottom:'12px' };
+    const card = { background:'#fffdf5', border:'2px solid #14110d', borderRadius:'3px', padding:'14px', marginBottom:'14px', boxShadow:'4px 4px 0 rgba(20,17,13,.12)' };
+    const miniBtn = { display:'inline-block', font:"600 11px/1 'Oswald',sans-serif", letterSpacing:'.06em', textTransform:'uppercase', color:'#14110d', background:'#e7d9b8', border:'2px solid #14110d', borderRadius:'2px', padding:'8px 10px', cursor:'pointer' };
+    const addBtn = { width:'100%', font:"600 13px/1 'Oswald',sans-serif", letterSpacing:'.08em', textTransform:'uppercase', color:'#f6f4ee', background:'#2f6b3f', border:'2px solid #14110d', borderRadius:'3px', padding:'13px', cursor:'pointer' };
+    const delBtn = { font:"600 11px/1 'Oswald',sans-serif", letterSpacing:'.06em', textTransform:'uppercase', color:'#d12b25', background:'transparent', border:'2px solid #d12b25', borderRadius:'2px', padding:'7px 11px', cursor:'pointer' };
+    const secHead = { font:"400 22px/1 'Anton',sans-serif", textTransform:'uppercase', letterSpacing:'.02em', color:'#14110d', margin:'4px 0 12px', paddingBottom:'7px', borderBottom:'2px solid #14110d' };
+
+    const txt = (label,path,val,type,ph)=> h('label',{key:path,style:wrap},
+      h('span',{style:lab},label),
+      h('input',{ type:type||'text', value:val==null?'':val, placeholder:ph||'', onChange:e=>this.setPath(path,e.target.value), style:inp }));
+
+    const num = (label,path,val,step)=> h('label',{key:path,style:wrap},
+      h('span',{style:lab},label),
+      h('input',{ type:'number', step:step||'any', value:val==null?'':val, onChange:e=>this.setPath(path,e.target.value), style:inp }));
+
+    const area = (label,path,val)=> h('label',{key:path,style:wrap},
+      h('span',{style:lab},label),
+      h('textarea',{ value:val==null?'':val, onChange:e=>this.setPath(path,e.target.value), rows:3, style:{...inp, resize:'vertical', lineHeight:1.45} }));
+
+    const sel = (label,path,val,options)=> h('label',{key:path,style:wrap},
+      h('span',{style:lab},label),
+      h('select',{ value:val==null?'':val, onChange:e=>this.setPath(path,e.target.value), style:{...inp, cursor:'pointer'} },
+        options.map(o=> h('option',{key:o,value:o},o))));
+
+    const colorField = (label,path,val)=> h('div',{key:path,style:wrap},
+      h('span',{style:lab},label),
+      h('div',{style:{display:'flex',flexWrap:'wrap',gap:'6px',alignItems:'center'}},
+        this.STYLE_PRESETS.map(cc=> h('button',{key:cc,title:cc,onClick:()=>this.setPath(path,cc),style:{width:'24px',height:'24px',background:cc,border:(val&&String(val).toLowerCase()===cc.toLowerCase())?'3px solid #14110d':'2px solid rgba(20,17,13,.25)',borderRadius:'3px',cursor:'pointer',padding:0}})),
+        h('input',{type:'color',value:val||'#000000',onChange:e=>this.setPath(path,e.target.value),style:{width:'30px',height:'28px',padding:0,border:'2px solid #14110d',borderRadius:'3px',background:'none',cursor:'pointer'}}),
+        h('input',{value:val||'',onChange:e=>this.setPath(path,e.target.value),style:{...inp,width:'92px',flex:'none'}})));
+
+    const imageField = (label,path,val)=> h('div',{key:path,style:wrap},
+      h('span',{style:lab},label),
+      h('div',{style:{display:'flex',gap:'10px',alignItems:'flex-start'}},
+        (val
+          ? h('img',{src:val,style:{width:'64px',height:'64px',objectFit:'cover',border:'2px solid #14110d',borderRadius:'3px',flex:'none'}})
+          : h('div',{style:{width:'64px',height:'64px',border:'2px dashed #b9b1a3',borderRadius:'3px',flex:'none',display:'flex',alignItems:'center',justifyContent:'center',font:"600 9px/1.2 'Oswald'",color:'#b9b1a3',textAlign:'center'}},'no image')),
+        h('div',{style:{flex:1,minWidth:0,display:'flex',flexDirection:'column',gap:'7px'}},
+          h('input',{value:(val&&String(val).startsWith('data:'))?'':(val||''),placeholder:'Paste image URL…',onChange:e=>this.setPath(path,e.target.value),style:inp}),
+          h('label',{style:{...miniBtn,textAlign:'center'}},'⬆ Upload from computer',
+            h('input',{type:'file',accept:'image/*',onChange:e=>{const f=e.target.files&&e.target.files[0]; if(f) this.readImg(f,d=>this.setPath(path,d)); e.target.value='';},style:{display:'none'}})))));
+
+    const row = (...els)=> h('div',{style:{display:'flex',gap:'10px'}}, els.map((e,i)=> h('div',{key:i,style:{flex:1,minWidth:0}},e)));
+    const section = (title, ...kids)=> h('div',{style:{marginBottom:'10px'}}, h('div',{style:secHead},title), ...kids);
+
+    const styleNames = c.styleDefs.map(s=> s.name);
+
+    /* ---- tabs body ---- */
+    let body;
+    if(tab==='reviews'){
+      body = h('div',null,
+        h('p',{style:{font:"italic 400 12px/1.5 'Libre Baskerville',serif",color:'#5a5044',margin:'0 0 14px'}},'Each review is a pin on the map and a card in the standings. Score sets the color and rank; the video link drives the player.'),
+        c.reviews.map((r,i)=> h('div',{key:i,style:card},
+          txt('Shop name','reviews.'+i+'.name', r.name),
+          row(
+            num('Score (0–10)','reviews.'+i+'.score', r.score, '0.1'),
+            sel('Style','reviews.'+i+'.style', r.style, styleNames),
+          ),
+          txt('Reviewed by (optional)','reviews.'+i+'.author', r.author,'','e.g. Tony'),
+          txt('YouTube video link','reviews.'+i+'.video', r.video,'','https://youtube.com/watch?v=…'),
+          row(
+            num('Latitude','reviews.'+i+'.lat', r.lat, 'any'),
+            num('Longitude','reviews.'+i+'.lng', r.lng, 'any'),
+          ),
+          area('Verdict','reviews.'+i+'.verdict', r.verdict),
+          h('div',{style:{textAlign:'right'}}, h('button',{onClick:()=>this.delReview(i),style:delBtn},'✕ Delete review')),
+        )),
+        h('button',{onClick:()=>this.addReview(),style:addBtn},'+ Add a review'),
+      );
+    } else if(tab==='styles'){
+      body = h('div',null,
+        h('p',{style:{font:"italic 400 12px/1.5 'Libre Baskerville',serif",color:'#5a5044',margin:'0 0 14px'}},'Styles appear on the “Pizza Styles” page and in the map’s style filter. The count updates automatically from your reviews.'),
+        c.styleDefs.map((s,i)=> h('div',{key:i,style:card},
+          txt('Style name','styleDefs.'+i+'.name', s.name),
+          colorField('Accent color','styleDefs.'+i+'.color', s.color),
+          imageField('Image','styleDefs.'+i+'.image', s.image),
+          area('Description','styleDefs.'+i+'.desc', s.desc),
+          h('div',{style:{textAlign:'right'}}, h('button',{onClick:()=>this.delStyle(i),style:delBtn},'✕ Delete style')),
+        )),
+        h('button',{onClick:()=>this.addStyle(),style:addBtn},'+ Add a style'),
+      );
+    } else {
+      body = h('div',null,
+        section('Branding & Links',
+          imageField('Logo','logo', c.logo),
+          txt('YouTube / subscribe link','youtube', c.youtube),
+        ),
+        section('Navigation labels',
+          row(txt('Map','nav.map',c.nav.map), txt('Ratings','nav.ratings',c.nav.ratings)),
+          row(txt('Styles','nav.styles',c.nav.styles), txt('About','nav.about',c.nav.about)),
+        ),
+        section('Hero',
+          txt('Kicker','hero.kicker', c.hero.kicker),
+          txt('Script line','hero.script', c.hero.script),
+          row(txt('Title','hero.titleLead', c.hero.titleLead), txt('Highlighted word','hero.titleHighlight', c.hero.titleHighlight)),
+          area('Blurb','hero.blurb', c.hero.blurb),
+          txt('Button label','hero.cta', c.hero.cta),
+          h('div',{style:{...lab,marginTop:'4px'}},'Background photos'),
+          imageField('Photo 1 (wide)','heroImages.0', c.heroImages[0]),
+          imageField('Photo 2','heroImages.1', c.heroImages[1]),
+          imageField('Photo 3','heroImages.2', c.heroImages[2]),
+          imageField('Photo 4','heroImages.3', c.heroImages[3]),
+          imageField('Photo 5','heroImages.4', c.heroImages[4]),
+        ),
+        section('Map section',
+          txt('Heading','map.heading', c.map.heading),
+          area('Subtitle','map.subtitle', c.map.subtitle),
+        ),
+        section('Pizza Ratings page',
+          txt('Heading','ratings.heading', c.ratings.heading),
+          area('Subtitle','ratings.subtitle', c.ratings.subtitle),
+        ),
+        section('Pizza Styles page',
+          txt('Heading','styles.heading', c.styles.heading),
+          area('Subtitle','styles.subtitle', c.styles.subtitle),
+        ),
+        section('About page',
+          txt('Heading','about.heading', c.about.heading),
+          txt('Script line','about.script', c.about.script),
+          area('Body','about.body', c.about.body),
+        ),
+        section('Footer',
+          txt('Tagline','footer.tagline', c.footer.tagline),
+        ),
+      );
+    }
+
+    const tabBtn = (key,label)=> h('button',{key,onClick:()=>this.setState({adminTab:key}),style:{flex:1,font:"600 12px/1 'Oswald',sans-serif",letterSpacing:'.06em',textTransform:'uppercase',color:tab===key?'#f6f4ee':'#14110d',background:tab===key?'#d12b25':'transparent',border:'none',borderRight:'2px solid #14110d',padding:'13px 6px',cursor:'pointer'}},label);
+
+    const panel = h('div',{className:'dd-adminPanel',onClick:e=>e.stopPropagation(),style:{position:'fixed',top:0,right:0,bottom:0,width:'min(460px,100vw)',zIndex:1601,background:'#f1efe9',borderLeft:'4px solid #14110d',boxShadow:'-14px 0 40px rgba(20,17,13,.4)',display:'flex',flexDirection:'column'}},
+      h('div',{style:{display:'flex',alignItems:'center',gap:'10px',padding:'15px 16px',background:'#14110d',color:'#f6f4ee',flex:'none'}},
+        h('span',{style:{font:"400 22px/1 'Anton',sans-serif",textTransform:'uppercase',letterSpacing:'.02em'}},'Edit Site'),
+        h('span',{style:{font:"600 9px/1.3 'Oswald',sans-serif",letterSpacing:'.08em',textTransform:'uppercase',color:'#e7b94e',border:'1px solid #e7b94e',borderRadius:'2px',padding:'3px 6px'}},'auto-saved'),
+        h('button',{onClick:()=>this.closeAdmin(),style:{marginLeft:'auto',width:'34px',height:'34px',borderRadius:'50%',background:'#d12b25',color:'#f6f4ee',border:'2px solid #f6f4ee',font:"400 17px/1 'Oswald'",cursor:'pointer'}},'✕')),
+      h('div',{style:{display:'flex',borderBottom:'3px solid #14110d',background:'#e7d9b8',flex:'none'}},
+        tabBtn('reviews','Reviews'), tabBtn('styles','Styles'), tabBtn('content','Text & Images')),
+      h('div',{className:'dd-adminBody',style:{flex:1,minHeight:0,overflowY:'auto',padding:'16px'}}, body),
+      h('div',{style:{flex:'none',borderTop:'3px solid #14110d',background:'#e9e7e2',padding:'12px 16px'}},
+        h('p',{style:{font:"400 11px/1.45 'Oswald',sans-serif",color:'#7a6f5d',margin:'0 0 10px'}},'Changes save in this browser instantly. To publish for visitors or back up your work, export the content file — then re-import it on any device.'),
+        h('div',{style:{display:'flex',gap:'8px',flexWrap:'wrap'}},
+          h('button',{onClick:()=>this.doExport(),style:{...miniBtn,flex:1,background:'#2f6b3f',color:'#f6f4ee'}},'⬇ Export content'),
+          h('label',{style:{...miniBtn,flex:1,textAlign:'center'}},'⬆ Import',
+            h('input',{type:'file',accept:'application/json,.json',onChange:e=>{const f=e.target.files&&e.target.files[0]; if(f) this.doImport(f); e.target.value='';},style:{display:'none'}})),
+          h('button',{onClick:()=>this.doReset(),style:{...miniBtn,flex:1,background:'transparent',color:'#9a8a6e'}},'↺ Reset'))));
+
+    const backdrop = h('div',{onClick:()=>this.closeAdmin(),style:{position:'fixed',inset:0,zIndex:1600,background:'rgba(12,9,6,.45)'}});
+    return h(React.Fragment, null, backdrop, panel);
+  }
+
+  renderVals(){
+    const c = this.state.content;
+    const v = this.state.view;
+
+    const featuredSrc = c.reviews.slice().sort((a,b)=> (Number(b.score)||0)-(Number(a.score)||0))[0] || { name:'', score:0, style:'', video:'', verdict:'' };
+    const featured = this.decorate(featuredSrc);
+
+    const ranked = c.reviews.slice().sort((a,b)=> (Number(b.score)||0)-(Number(a.score)||0)).map((r,i)=>{
+      const d = this.decorate(r);
+      d.rankStr = '#'+(i+1);
+      d.thumbEl = d.thumb
+        ? React.createElement('img', { src:d.thumb, alt:'', style:{ width:'100%', height:'100%', objectFit:'cover', display:'block', filter:'grayscale(.4) contrast(1.04)' } })
+        : React.createElement('div', { style:{ width:'100%', height:'100%', background:'#cfc4ad' } });
+      return d;
+    });
+
+    const styles = c.styleDefs.map(s=>{
+      const cnt = c.reviews.filter(r=> r.style===s.name).length;
+      return Object.assign({}, s, {
+        countLabel: cnt===0 ? 'Soon' : (cnt + (cnt===1?' spot':' spots')),
+        open: ()=> this.goToStyle(s.name),
+        imageEl: s.image
+          ? React.createElement('img', { src:s.image, alt:s.name, style:{ width:'100%', height:'100%', objectFit:'cover', display:'block' } })
+          : React.createElement('div', { style:{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', textAlign:'center', padding:'10px', font:"600 10px/1.4 'Oswald',sans-serif", letterSpacing:'.08em', textTransform:'uppercase', color:'#b3a892' } }, 'Add a photo in Edit Site'),
+      });
+    });
+
+    const navItems = [['map',c.nav.map],['ratings',c.nav.ratings],['styles',c.nav.styles],['about',c.nav.about]].map(([key,label])=>{
+      const active = v===key;
+      return { label, go:()=> this.setState({ view:key }),
+        style:`font:600 18px/1 'Oswald',sans-serif; letter-spacing:.08em; text-transform:uppercase; color:${active?'#d12b25':'#14110d'}; padding:9px 15px; cursor:pointer; white-space:nowrap; border-bottom:3px solid ${active?'#d12b25':'transparent'};` };
+    });
+
+    const vid = this.state.video;
+    const featuredThumbEl = featured.thumb
+      ? React.createElement('img', { src:featured.thumb, alt:'', style:{ width:'100%', height:'100%', objectFit:'cover', display:'block', filter:'grayscale(.45) contrast(1.04)' } })
+      : React.createElement('div', { style:{ width:'100%', height:'100%', background:'#cfc4ad' } });
+
+    const mkImg = (src, style, extra)=> React.createElement('img', Object.assign({ src:this.resolveAsset(src), style }, extra||{}));
+    const heroFilter = 'grayscale(1) contrast(1.02) brightness(1.32)';
+    const heroImgEl = (i, flex, alt)=> mkImg(c.heroImages[i], { flex:String(flex), minWidth:0, height:'100%', objectFit:'cover', display:'block', filter:heroFilter }, { alt:alt||'' });
+
+    return {
+      logoHeaderEl: mkImg(c.logo, { width:'46px', height:'46px', borderRadius:'7px', display:'block', border:'2px solid #14110d' }, { alt:'Dough and Disorder' }),
+      logoHeroEl: mkImg(c.logo, { width:'236px', height:'236px', display:'block' }, { alt:'Dough and Disorder', className:'dd-heroLogoImg' }),
+      logoFooterEl: mkImg(c.logo, { width:'58px', height:'58px', borderRadius:'7px', border:'2px solid #e8ddca' }, { alt:'' }),
+      logoAboutEl: mkImg(c.logo, { width:'188px', height:'188px', display:'block' }, { alt:'Dough and Disorder' }),
+      logoVideoEl: mkImg(c.logo, { width:'42px', height:'42px', borderRadius:'6px', border:'2px solid #14110d', flex:'none' }, { alt:'' }),
+      heroImg0El: heroImgEl(0, 1.5, 'Vintage pizza storefronts collage'),
+      heroImg1El: heroImgEl(1, 1, ''),
+      heroImg2El: heroImgEl(2, 1, ''),
+      heroImg3El: heroImgEl(3, 1, ''),
+      heroImg4El: heroImgEl(4, 1, ''),
+      youtubeUrl: c.youtube,
+      heroKicker: c.hero.kicker, heroScript: c.hero.script, heroTitleLead: c.hero.titleLead, heroTitleHighlight: c.hero.titleHighlight, heroBlurb: c.hero.blurb, heroCta: c.hero.cta,
+      mapHeading: c.map.heading, mapSubtitle: c.map.subtitle,
+      ratingsBadge: c.ratings.badge, ratingsHeading: c.ratings.heading, ratingsSubtitle: c.ratings.subtitle,
+      stylesHeading: c.styles.heading, stylesSubtitle: c.styles.subtitle,
+      aboutHeading: c.about.heading, aboutScript: c.about.script,
+      aboutParas: (c.about.body||'').split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean),
+      footerTagline: c.footer.tagline,
+
+      navItems, featured, featuredThumbEl, ranked, styles,
+      styleOptions: c.styleDefs,
+      styleFilter: this.state.styleFilter,
+      scoreFilter: this.state.scoreFilter,
+      onStyle: (e)=>{ const val=e.target.value; this.setState({ styleFilter:val }); setTimeout(()=> this.syncMarkers(), 0); },
+      onScore: (e)=>{ const val=e.target.value; this.setState({ scoreFilter:val }); setTimeout(()=> this.syncMarkers(), 0); },
+      query: this.state.query,
+      onSearch: (e)=>{ const val=e.target.value; this.setState({ query:val }); setTimeout(()=> this.syncMarkers(), 0); },
+
+      isRatings: v==='ratings', isStyles: v==='styles', isAbout: v==='about',
+      goMap: ()=> this.setState({ view:'map' }),
+      scrollToMap: ()=>{ this.setState({ view:'map' }); setTimeout(()=>{ const el=document.getElementById('dd-map-section'); if(el){ const y=el.getBoundingClientRect().top + window.scrollY - 72; window.scrollTo({ top:y, behavior:'smooth' }); } },30); },
+
+      openAdmin: ()=> this.openAdmin(),
+      adminEl: this.adminEl(),
+      pwEl: this.pwEl(),
+
+      closeVideo: ()=> this.setState({ video:null }),
+      stop: (e)=> e.stopPropagation(),
+      video: vid,
+      videoSrc: vid ? `https://www.youtube-nocookie.com/embed/${vid.vid}?autoplay=1&rel=0&playsinline=1` : '',
+      videoName: vid ? vid.name : '',
+      videoMeta: vid ? this.metaLine(vid) : '',
+      videoScore: vid ? vid.scoreStr : '',
+      videoVerdict: vid ? vid.verdict : '',
+      videoUrl: vid ? this.yt(vid.vid) : '#',
+      videoPoster: vid && vid.thumb ? `url(${vid.thumb})` : 'none',
+    };
+  }
+}
+</script>
+</body>
+</html>
